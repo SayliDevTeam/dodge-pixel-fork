@@ -52,7 +52,7 @@ window.addEventListener('load', function() {
     // Configurable values
     const spawnInterval = 1200;        // ms between spans
     const obstacleSpeedLimit = 20;
-    let obstacleSpeed = 4;           // fall speed
+    let obstacleSpeed = 2;           // fall speed
     const scoreTimeout = 3000;
     // const obstacleWidth = 50;
     // const obstacleHeight = 80;
@@ -150,8 +150,10 @@ window.addEventListener('load', function() {
 
         // Speed up obstacles
         if(obstacleSpeed<obstacleSpeedLimit){
-            obstacleSpeed += 0.2;
+            obstacleSpeed += 0.05;
         }
+
+        console.log(obstacleSpeed);
 
         // Update score
         score++;
