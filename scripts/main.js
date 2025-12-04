@@ -6,39 +6,45 @@ window.addEventListener('load', function() {
     let currentLane = 1;
     let score = 0;
 
-    function moveLeft() {
-        if (currentLane > 0) {
-            currentLane--;
-            updatePlayerPosition();
-        }
+  function moveLeft() {
+    if (currentLane > 0) {
+      currentLane--;
+      updatePlayerPosition();
     }
+  }
 
-    function moveRight() {
-        if (currentLane < 2) {
-            currentLane++;
-            updatePlayerPosition();
-        }
+  function moveRight() {
+    if (currentLane < 2) {
+      currentLane++;
+      updatePlayerPosition();
     }
+  }
 
-    function updatePlayerPosition() {
-        const x = lanePositions[currentLane];
-        player.style.transform = `translateX(${x}px)`;  
+  function updatePlayerPosition() {
+    const x = lanePositions[currentLane];
+    player.style.transform = `translateX(${x}px)`;
+  }
+
+  // Example key controls
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') {
+      moveLeft();
     }
+    if (e.key === 'ArrowRight') {
+      moveRight();
+    }
+    if (e.key === 'q') {
+      moveLeft();
+    }
+    if (e.key === 'd') {
+      moveRight();
+    }
+  });
 
-    // Example key controls
-    document.addEventListener("keydown", e => {
-        if (e.key === "ArrowLeft"){
-            moveLeft();
-        } 
-        if (e.key === "ArrowRight"){
-            moveRight();
-        } 
-    });
+  // Iniatilize player
+  updatePlayerPosition();
 
-    // Iniatilize player
-    updatePlayerPosition();
-
-    // Main obstacles logic
+  // Main obstacles logic
 
     const game = document.getElementById('game');
     const scoreDisplay = document.getElementById('score');
@@ -48,50 +54,62 @@ window.addEventListener('load', function() {
     const obstacleSpeedLimit = 20;
     let obstacleSpeed = 4;           // fall speed
     const scoreTimeout = 3000;
-    const obstacleWidth = 50;
-    const obstacleHeight = 80;
+    // const obstacleWidth = 50;
+    // const obstacleHeight = 80;
 
-    let obstacles = [];
-    let gameOver = false;
+  let obstacles = [];
+  let gameOver = false;
 
-    // Spawn obst   acles
-    function spawnObstacle() {
-        if (gameOver) return;
+  // Spawn obstacles
+  function spawnObstacle() {
+    if (gameOver) return;
 
-        const lane = Math.floor(Math.random() * 3);
-        const x = lanePositions[lane];
+    const lane = Math.floor(Math.random() * 3);
+    const x = lanePositions[lane] + -25;
 
-        const ob = document.createElement('div');
-        ob.classList.add('obstacle');
-        ob.style.left = x + 'px';
-        ob.style.top = '-100px';
+    // Create img element instead of div
+    const ob = document.createElement('img');
+    ob.classList.add('obstacle');
 
-        game.appendChild(ob);
+    // Randomly select between car images
+    const carImages = [
+      'assets/random-car-01.png',
+      'assets/random-car-02.png',
+      'assets/random-car-03.png',
+    ];
+    const randomImage = carImages[Math.floor(Math.random() * carImages.length)];
+    ob.src = randomImage;
 
-        obstacles.push({
-            element: ob,
-            lane: lane,
-            y: -100
-        });
-    }
+    ob.style.left = x + 'px';
+    ob.style.top = '-100px';
+    ob.style.position = 'absolute';
+    ob.style.width = '100px';
+    ob.style.height = 'auto';
+    ob.style.objectFit = 'contain';
+    ob.style.borderRadius = '100%';
+    // ob.style.border = '1px solid red';
+
+    game.appendChild(ob);
+
+    obstacles.push({
+      element: ob,
+      lane: lane,
+      y: -100,
+    });
+  }
 
     setInterval(spawnObstacle, spawnInterval);
     setTimeout(() => {
         setInterval(updateScore, spawnInterval);
     }, scoreTimeout);
 
-    // Collision check
-    function checkCollision(a, b) {
-        const r1 = a.getBoundingClientRect();
-        const r2 = b.getBoundingClientRect();
+  // Collision check
+  function checkCollision(a, b) {
+    const r1 = a.getBoundingClientRect();
+    const r2 = b.getBoundingClientRect();
 
-        return !(
-            r1.right < r2.left ||
-            r1.left > r2.right ||
-            r1.bottom < r2.top ||
-            r1.top > r2.bottom
-        );
-    }
+    return !(r1.right < r2.left || r1.left > r2.right || r1.bottom < r2.top || r1.top > r2.bottom);
+  }
 
     // End game
     function endGame() {
@@ -100,28 +118,28 @@ window.addEventListener('load', function() {
         alert("Game Over! Your score is "+score);
     }
 
-    // Obstacle animation loop
-    function updateObstacles() {
-        if (!gameOver) {
-            for (let i = obstacles.length - 1; i >= 0; i--) {
-                const ob = obstacles[i];
+  // Obstacle animation loop
+  function updateObstacles() {
+    if (!gameOver) {
+      for (let i = obstacles.length - 1; i >= 0; i--) {
+        const ob = obstacles[i];
 
-                ob.y += obstacleSpeed;
-                ob.element.style.transform = `translateY(${ob.y}px)`;
+        ob.y += obstacleSpeed;
+        ob.element.style.transform = `translateY(${ob.y}px) rotate(-90deg)`;
 
-                // collision test
-                if (checkCollision(player, ob.element)) {
-                    endGame();
-                    return;
-                }
-
-                // remove offscreen
-                if (ob.y > game.offsetHeight + 100) {
-                    ob.element.remove();
-                    obstacles.splice(i, 1);
-                }
-            }
+        // collision test
+        if (checkCollision(player, ob.element)) {
+          endGame();
+          return;
         }
+
+        // remove offscreen
+        if (ob.y > game.offsetHeight + 100) {
+          ob.element.remove();
+          obstacles.splice(i, 1);
+        }
+      }
+    }
 
         requestAnimationFrame(updateObstacles);
     }
@@ -140,5 +158,5 @@ window.addEventListener('load', function() {
         scoreDisplay.innerHTML = score;
     }
 
-    requestAnimationFrame(updateObstacles);
+  requestAnimationFrame(updateObstacles);
 });
