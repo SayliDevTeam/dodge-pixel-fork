@@ -32,6 +32,12 @@ window.addEventListener('load', function () {
     if (e.key === 'ArrowRight') {
       moveRight();
     }
+    if (e.key === 'q') {
+      moveLeft();
+    }
+    if (e.key === 'd') {
+      moveRight();
+    }
   });
 
   // Iniatilize player
