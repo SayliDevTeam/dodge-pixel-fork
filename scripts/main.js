@@ -4,6 +4,7 @@ window.addEventListener('load', function() {
     const player = document.getElementById('player');
     const lanePositions = [25, 125, 225];
     let currentLane = 1;
+    let score = 0;
 
     function moveLeft() {
         if (currentLane > 0) {
@@ -40,17 +41,20 @@ window.addEventListener('load', function() {
     // Main obstacles logic
 
     const game = document.getElementById('game');
+    const scoreDisplay = document.getElementById('score');
 
     // Configurable values
     const spawnInterval = 1200;        // ms between spans
-    const obstacleSpeed = 4;           // fall speed
+    const obstacleSpeedLimit = 20;
+    let obstacleSpeed = 4;           // fall speed
+    const scoreTimeout = 3000;
     const obstacleWidth = 50;
     const obstacleHeight = 80;
 
     let obstacles = [];
     let gameOver = false;
 
-    // Spawn obstacles
+    // Spawn obst   acles
     function spawnObstacle() {
         if (gameOver) return;
 
@@ -72,6 +76,9 @@ window.addEventListener('load', function() {
     }
 
     setInterval(spawnObstacle, spawnInterval);
+    setTimeout(() => {
+        setInterval(updateScore, spawnInterval);
+    }, scoreTimeout);
 
     // Collision check
     function checkCollision(a, b) {
@@ -90,7 +97,7 @@ window.addEventListener('load', function() {
     function endGame() {
         if (gameOver) return;
         gameOver = true;
-        alert("Game Over!");
+        alert("Game Over! Your score is "+score);
     }
 
     // Obstacle animation loop
@@ -117,6 +124,20 @@ window.addEventListener('load', function() {
         }
 
         requestAnimationFrame(updateObstacles);
+    }
+
+    // Score update
+    function updateScore(){
+        if (gameOver) return;
+
+        // Speed up obstacles
+        if(obstacleSpeed<obstacleSpeedLimit){
+            obstacleSpeed += 0.2;
+        }
+
+        // Update score
+        score++;
+        scoreDisplay.innerHTML = score;
     }
 
     requestAnimationFrame(updateObstacles);
